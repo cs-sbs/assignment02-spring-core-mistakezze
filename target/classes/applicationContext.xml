@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <!-- 定义业务逻辑Bean -->
+    <bean id="userService" class="org.example.service.UserService">
+        <property name="lockedAccounts">
+            <set>
+                <value>locked_user</value> <!-- 模拟被锁定的账户 -->
+            </set>
+        </property>
+    </bean>
+
+    <!-- 定义日志切面Bean -->
+    <bean id="loggingAspect" class="org.example.aspect.LoggingAspect"/>
+
+    <!-- AOP配置 -->
+    <aop:config>
+        <aop:aspect ref="loggingAspect">
+            <!-- 匹配UserService的login方法 -->
+            <aop:pointcut id="loginMethod"
+                          expression="execution(* org.example.service.UserService.login(..))"/>
+            <!-- 前置通知 -->
+            <aop:before method="logBeforeMethod" pointcut-ref="loginMethod"/>
+            <!-- 后置通知 -->
+            <aop:after method="logAfterMethod" pointcut-ref="loginMethod"/>
+        </aop:aspect>
+    </aop:config>
+</beans>
